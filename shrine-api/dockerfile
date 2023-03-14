@@ -1,0 +1,2 @@
+FROM golang:latest
+WORKDIR /Users/t0rand/shrine-api

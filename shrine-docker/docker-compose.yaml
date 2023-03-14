@@ -1,0 +1,63 @@
+version: '3'
+networks:
+  ichinomiya_network:
+    external: true
+services:
+  ui:
+    image: node:latest
+    restart: always
+    working_dir: "/var/www/shrine-ui"
+    command: ["bash", "-c", "yarn install && yarn dev"]
+    environment:
+      TZ: Asia/Tokyo
+    tty: true
+    volumes:
+      - ${UI_DIR}:/var/www/shrine-ui
+      - nodemodules:/var/www/shrine-ui/node_modules
+    ports:
+      - "80:8080"
+    networks:
+      - ichinomiya_network
+  api:
+    image: cosmtrek/air
+    restart: always
+    working_dir: "/var/www/shrine-ui"
+    command: ["bash", "-c", "go mod download && go mod verify && air"]
+    environment:
+      TZ: Asia/Tokyo
+    tty: true
+    volumes:
+      - ${API_DIR}:/var/www/shrine-api
+    ports:
+      - "81:8080"
+    depends_on:
+      - mysql
+    networks:
+      - ichinomiya_network
+  mysql:
+    image: mysql:latest
+    command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    restart: always
+    environment:
+      TZ: Asia/Tokyo
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: shrine
+      MYSQL_USER: shrine
+      MYSQL_PASSWORD: password
+    volumes:
+      - mysql:/var/t0rand/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - ichinomiya_network
+  mail:
+    image: mailhog/mailhog:latest
+    restart: always
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+    networks:
+      - ichinomiya_network
+volumes:
+  mysql:
+  nodemodules:

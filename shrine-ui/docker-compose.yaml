@@ -1,0 +1,19 @@
+version: '3'
+networks:
+  ichinomiya_network:
+    external: true
+services:
+  ui: 
+    image: t0rand/shrine-ui:develop
+    container_name: shrine-ui
+    restart: always
+    tty: true
+    ports:
+      - "80:8080"
+    networks:
+      - ichinomiya_network
+    logging:
+      driver: syslog
+      options:
+        syslog-facility: "local1"
+        tag: "ui"

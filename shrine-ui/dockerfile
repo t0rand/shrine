@@ -1,0 +1,19 @@
+FROM node:latest
+
+ENV TZ="Asia/Tokyo"
+
+WORKDIR /var/www/shrine-ui/
+
+COPY package-lock.json .
+COPY package.json .
+COPY yarn.lock .
+
+RUN ["/bin/bash", "-c", "yarn config set network-timeout 300000"]
+RUN ["/bin/bash", "-c", "yarn install"]
+
+COPY . .
+
+RUN ["/bin/bash", "-c", "yarn build"]
+
+EXPOSE 8080
+CMD ["yarn", "start"]
